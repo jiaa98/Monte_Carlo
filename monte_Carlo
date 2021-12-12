@@ -1,0 +1,64 @@
+# encoding = 'utf-8'
+import pandas as pd
+import random
+
+
+def monte_Carlo(dataframe, GarageCars_list, CentralAir_list, Neighborhood_list, max_level, total_money):
+    """
+    :param dataframe:
+    :param GarageCars_list:
+    :param CentralAir_list:
+    :param Neighborhood_list:
+    :param max_level:
+    :param total_money:
+    :return:
+    """
+
+    L = []
+    count = 0
+    while count < max_level:
+        GarageCars = random.choice(GarageCars_list)
+        CentralAir = random.choice(CentralAir_list)
+        Neighborhood = random.choice(Neighborhood_list)
+        d1 = dataframe[dataframe['GarageCars'] == GarageCars]
+        d2 = d1[d1['CentralAir'] == CentralAir]
+        d3 = d2[d2['Neighborhood'] == Neighborhood]
+        if len(d3) == 0:
+            continue
+        minSalePrice = min(list(d3['SalePrice']))
+        if minSalePrice < total_money:
+            L.append([f"GarageCars:{GarageCars},CentralAir:{CentralAir},Neighborhood:{Neighborhood}"])
+
+        count += 1
+        print(f"count:{count}")
+
+    dict_all = {}
+    for item in L:
+        if item[0] not in dict_all:
+            dict_all[item[0]] = 0
+        else:
+            dict_all[item[0]] += 1
+
+    sort_dict = sorted(dict_all.items(), key=lambda x: x[1], reverse=True)
+
+    return sort_dict
+
+
+if __name__ == "__main__":
+
+    GarageCars_list_ = [0, 1, 2, 3, 4]
+    CentralAir_list_ = ['N', 'Y']
+    Neighborhood_list_ = \
+        ['Blmngtn', 'Blueste', 'BrDale', 'BrkSide', 'ClearCr', 'CollgCr', 'Crawfor', 'Edwards', 'Gilbert',
+         'IDOTRR', 'MeadowV', 'Mitchel', 'NAmes', 'NPkVill', 'NWAmes', 'NoRidge', 'NridgHt', 'OldTown',
+         'SWISU', 'Sawyer', 'SawyerW', 'Somerst', 'StoneBr', 'Timber', 'Veenker']
+
+    data = pd.read_csv("./train.csv", header=0, encoding='utf-8')
+    res = monte_Carlo(dataframe=data,
+                      GarageCars_list=GarageCars_list_,
+                      CentralAir_list=CentralAir_list_,
+                      Neighborhood_list=Neighborhood_list_,
+                      max_level=10000,
+                      total_money=130000
+                      )
+    print(res)
